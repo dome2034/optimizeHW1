@@ -29,7 +29,7 @@
 #include <time.h>
 
 #define GA_POPSIZE 2048 // Population size
-#define GA_MAXITER 16348 // Maximum iterations
+#define GA_MAXITER 1648 // Maximum iterations
 #define GA_ELITERATE 0.10 // Elitism rate
 #define GA_MUTPERC 0.25 // Mutation rate
 #define PRINT_INTER 0 // Print status every this iterations/generations
@@ -50,8 +50,8 @@ typedef struct
 } ga_memb;
 
 void init_pop(ga_memb *pop); /* Calls: */
-void zero_fitness(ga_memb *pop); /* Set fitnesses to 0 */
-void randall_sols(ga_memb *pop); /* Make all the solutions random */
+  void zero_fitness(ga_memb *pop); /* Set fitnesses to 0 */
+  void randall_sols(ga_memb *pop); /* Make all the solutions random */
 
 void calc_fitness(ga_memb *pop); /* Calculate a member's fitness based on its
                                     solution */
@@ -63,15 +63,15 @@ void sort_by_fitness(ga_memb *pop); /* Sort the whole population by fitness */
 void print_best(ga_memb *pop, unsigned const int gen);
 
 void mate_pop(ga_memb *pop, ga_memb *buf); // Mates pop into buf
-void cp_mems(ga_memb *src, ga_memb *targ, unsigned int size);
-void mutate(ga_memb *pop); // Mutates some of the population
+  void cp_mems(ga_memb *src, ga_memb *targ, unsigned int size);
+  void mutate(ga_memb *pop); // Mutates some of the population
 
 /* Swaps the things that pt1 and pt2 point to */
 void swap_pts(ga_memb **pt1, ga_memb **pt2);
 
 /* We use a simple insertion sort */
-#define sort_by_fitness(a,b) (insertion_sort_ga_memb(a,b, GA_POPSIZE))
-void insertion_sort_ga_memb(ga_memb *a,ga_memb *b, int asize);
+#define sort_by_fitness(a) (insertion_sort_ga_memb(a, GA_POPSIZE))
+void insertion_sort_ga_memb(ga_memb *a, int asize);
 
 int main(void)
 {
@@ -90,7 +90,7 @@ int main(void)
   for (i = 0, j = 0; i < GA_MAXITER; i++, j++)
   {
     calc_fitness(pop); // Fill out ga_memb.fitness
-    sort_by_fitness(pop,buf);
+    sort_by_fitness(pop);
     
     if (j > PRINT_INTER) /* Print our stats every PRINT_INTER iterations of
                             the loop */
@@ -105,7 +105,8 @@ int main(void)
     
     mate_pop(pop, buf); // Mate the population into the buffer
     swap_pts(&pop, &buf); // Make the buffer our population, and vice versa
-  }	
+  }
+
   print_best(pop, i);
 
   return 0;
@@ -154,39 +155,24 @@ void calc_fitness(ga_memb *pop)
   }
 }
 
-#define balh(a,b) (insertion_sort_ga_memb(a,b, GA_POPSIZE))
+#define balh(a) (insertion_sort_ga_memb(a, GA_POPSIZE))
 
-void insertion_sort_ga_memb(ga_memb *a,ga_memb *b, int asize)
+void insertion_sort_ga_memb(ga_memb *a, int asize)
 {
   int i, j, k;
-  ga_memb temp_d[GA_POPSIZE*2];
   ga_memb d;
-	k = asize*2;
-   
-  for (i = 0; i < asize; i++) //copy a to temp
+
+  k = asize;
+  for (i = 0; i < k; i++)
   {
-    temp_d[i] = a[i];
-  }
-  for (i = 0; i < asize; i++) //copy b to temp
-  {
-    temp_d[asize+i] = b[i];
-  }
-   
-  for (i = 0; i < k; i++) //sort all from a and b
-  {
-    d = temp_d[i];
+    d = a[i];
     j = i - 1;
-    while (j >= 0 && temp_d[j].fitness > d.fitness)
+    while (j >= 0 && a[j].fitness > d.fitness)
     {
-      temp_d[j + 1] = temp_d[j];
+      a[j + 1] = a[j];
       j = j - 1;
     }
-    temp_d[j + 1] = d;
-  }
-  
-  for (i = 0; i < asize; i++) //choose the best of a and b
-  {
-    a[i] = temp_d[asize+i];
+    a[j + 1] = d;
   }
 }
 
@@ -194,12 +180,10 @@ void print_best(ga_memb *pop, unsigned const int gen)
 {
   int i;
 
-  printf("At gen %d, best: %d", gen, *(pop[GA_POPSIZE - 1].sol));
-  for (i = 1; i < TARGET_LEN; i++) {
-  	printf(", %d", *((pop[GA_POPSIZE - 1].sol) + i));
-  }
+  printf("At gen %d, best:%d", gen, *(pop[GA_POPSIZE - 1].sol));
+  for (i = 1; i < TARGET_LEN; i++) 
+              printf(",%d", *((pop[GA_POPSIZE - 1].sol) + i));
   printf("  (%d%%)\n", (pop[GA_POPSIZE - 1].fitness * 100 ) / TARGET_LEN);
-  
 }
 
 /* Our mating method is a simple cut and swap:
